@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complete, consistent visibility - Howl Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#04004F;--navy-deep:#030038;--gold:#FFB000;--gold-deep:#E69A00;
+    --plum:#8E24C1;--plum-soft:#a84fd6;--paper:#F4F0E6;--ink:#0F1028;--cyan:#04A8D2;
+    --line-dark:rgba(244,240,230,.14);--line-light:rgba(15,16,40,.12);
+    --mut-dark:rgba(244,240,230,.68);--mut-light:rgba(15,16,40,.64);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'Inter',sans-serif;background:var(--navy-deep);color:var(--paper);-webkit-font-smoothing:antialiased}
+
+  .deck{height:100%;width:100%;position:relative}
+  .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,80px);opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .55s cubic-bezier(.4,0,.2,1),transform .55s cubic-bezier(.4,0,.2,1),visibility 0s .55s}
+  .slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .55s cubic-bezier(.4,0,.2,1),transform .55s cubic-bezier(.4,0,.2,1)}
+  .slide-inner{width:100%;max-width:1120px;position:relative;z-index:2}
+
+  .s-navy{background:radial-gradient(1200px 800px at 78% 12%,rgba(142,36,193,.16),transparent 60%),radial-gradient(1000px 700px at 12% 92%,rgba(4,168,210,.12),transparent 55%),var(--navy)}
+  .s-paper{background:var(--paper);color:var(--ink)}
+  .s-gold{background:var(--gold);color:var(--ink)}
+
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;display:inline-flex;align-items:center;gap:14px;color:var(--gold)}
+  .eyebrow::before{content:"";width:34px;height:2px;background:var(--gold)}
+  .s-paper .eyebrow{color:var(--plum)}.s-paper .eyebrow::before{background:var(--plum)}
+  .s-gold .eyebrow{color:rgba(15,16,40,.8)}.s-gold .eyebrow::before{background:var(--ink)}
+
+  h1{font-size:clamp(38px,6.2vw,86px);font-weight:900;line-height:1.02;letter-spacing:-.045em;margin:26px 0 22px}
+  h2{font-size:clamp(30px,4.6vw,60px);font-weight:900;line-height:1.05;letter-spacing:-.04em;margin:22px 0 18px}
+  .gold{color:var(--gold)}.s-paper .gold{color:var(--gold-deep)}
+  .plum{color:var(--plum-soft)}.s-paper .plum{color:var(--plum)}
+  .cyan{color:var(--cyan)}
+  .sub{font-size:clamp(16px,1.6vw,21px);line-height:1.55;max-width:680px;color:var(--mut-dark)}
+  .s-paper .sub{color:var(--mut-light)}
+  .s-gold .sub{color:rgba(15,16,40,.78)}
+
+  .kicker{font-size:clamp(13px,1.2vw,15px);font-weight:600;color:var(--mut-dark);margin-top:34px;letter-spacing:.01em}
+  .s-paper .kicker{color:var(--mut-light)}
+
+  /* signal rings */
+  .rings{position:absolute;top:50%;right:-6%;transform:translateY(-50%);width:min(52vw,620px);aspect-ratio:1;pointer-events:none;z-index:1;opacity:.9}
+  .rings span{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(255,176,0,.28);animation:pulse 4.5s ease-out infinite}
+  .rings span:nth-child(2){animation-delay:1.1s;border-color:rgba(142,36,193,.3)}
+  .rings span:nth-child(3){animation-delay:2.2s;border-color:rgba(4,168,210,.3)}
+  .rings span:nth-child(4){animation-delay:3.3s;border-color:rgba(255,176,0,.22)}
+  .rings .core{position:absolute;top:50%;left:50%;width:14px;height:14px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%);box-shadow:0 0 44px rgba(255,176,0,.7);animation:none;border:none}
+  @keyframes pulse{0%{transform:scale(.12);opacity:.95}100%{transform:scale(1.05);opacity:0}}
+
+  /* quote slide */
+  .bigquote{font-size:clamp(24px,3.4vw,44px);font-weight:800;line-height:1.28;letter-spacing:-.025em;max-width:980px}
+  .bigquote .hl{color:var(--gold-deep);box-shadow:inset 0 -0.36em 0 rgba(255,176,0,.28)}
+  .attr{margin-top:36px;display:flex;align-items:center;gap:16px}
+  .avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,176,0,.18);border:1px solid var(--line-light);display:grid;place-items:center;font-weight:800;color:var(--gold-deep);font-size:18px;flex:none}
+  .attr b{display:block;font-size:15px}
+  .attr span{font-size:13px;color:var(--mut-light)}
+
+  /* problem slide */
+  .painrow{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+  .paincard{border:1px solid var(--line-dark);border-radius:16px;padding:28px;background:rgba(244,240,230,.04)}
+  .paincard .pt{font-weight:800;font-size:18px;letter-spacing:-.01em;margin-bottom:9px}
+  .paincard .pd{font-size:14.5px;line-height:1.55;color:var(--mut-dark)}
+  .punch{margin-top:42px;font-size:clamp(20px,2.6vw,32px);font-weight:800;letter-spacing:-.02em;line-height:1.3;border-left:3px solid var(--gold);padding-left:24px;max-width:860px}
+
+  /* data slide */
+  .datagrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,72px);align-items:center;margin-top:10px}
+  .dial{position:relative;width:min(38vw,340px);aspect-ratio:1;margin:0 auto}
+  .dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .dial .track{fill:none;stroke:rgba(15,16,40,.1);stroke-width:14}
+  .dial .fill{fill:none;stroke:var(--plum);stroke-width:14;stroke-linecap:round;stroke-dasharray:754;stroke-dashoffset:754;transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1) .3s}
+  .slide.active .dial .fill{stroke-dashoffset:226}
+  .dialnum{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+  .dialnum b{font-size:clamp(48px,6vw,76px);font-weight:900;letter-spacing:-.04em;color:var(--plum);line-height:1;display:block}
+  .dialnum i{font-style:normal;font-size:13px;font-weight:600;color:var(--mut-light);max-width:190px;display:block;margin-top:8px;line-height:1.4}
+  .datafacts .fact{padding:20px 0;border-bottom:1px solid var(--line-light)}
+  .datafacts .fact:last-child{border-bottom:none}
+  .datafacts .fn{font-size:clamp(26px,3vw,38px);font-weight:900;letter-spacing:-.03em;color:var(--ink)}
+  .datafacts .fn em{font-style:normal;color:var(--gold-deep)}
+  .datafacts .fl{font-size:14.5px;color:var(--mut-light);margin-top:5px;line-height:1.5;max-width:440px}
+
+  /* three surfaces slide */
+  .threelines{margin-top:8px}
+  .threelines .tl{font-size:clamp(28px,4.6vw,58px);font-weight:900;letter-spacing:-.04em;line-height:1.14;opacity:0;transform:translateY(18px);transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1)}
+  .slide.active .threelines .tl{opacity:1;transform:none}
+  .slide.active .threelines .tl:nth-child(1){transition-delay:.2s}
+  .slide.active .threelines .tl:nth-child(2){transition-delay:.7s}
+  .slide.active .threelines .tl:nth-child(3){transition-delay:1.2s}
+  .threelines .tl b{font-weight:900}
+  .tl .c1{color:var(--cyan)}.tl .c2{color:var(--gold)}.tl .c3{color:var(--plum-soft)}
+  .srcnote{margin-top:40px;font-size:14px;color:var(--mut-dark)}
+
+  /* system orbit slide */
+  .sysgrid{display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(26px,4vw,60px);align-items:center}
+  .orbitwrap{position:relative;width:min(42vw,440px);aspect-ratio:1;margin:0 auto}
+  .orbit-ring{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(15,16,40,.18);animation:spin 60s linear infinite}
+  .orbit-ring.r2{inset:17%;animation-duration:44s;animation-direction:reverse;border-color:rgba(142,36,193,.25)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .orbit-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34%;aspect-ratio:1;border-radius:50%;background:var(--navy);color:var(--paper);display:grid;place-items:center;text-align:center;font-weight:800;font-size:clamp(11px,1.1vw,14px);line-height:1.3;padding:12px;box-shadow:0 18px 44px rgba(4,0,79,.35)}
+  .node{position:absolute;transform:translate(-50%,-50%);background:#fff;border:1px solid var(--line-light);border-radius:999px;padding:9px 15px;font-size:clamp(10.5px,1vw,13px);font-weight:700;color:var(--ink);white-space:nowrap;box-shadow:0 8px 20px rgba(15,16,40,.10)}
+  .node.gold{border-color:var(--gold);color:var(--gold-deep)}
+  .node.plum{border-color:var(--plum);color:var(--plum)}
+  .node.cyan{border-color:var(--cyan);color:#067a9c}
+  .syslist{font-size:15px;line-height:1.65;color:var(--mut-light)}
+  .syslist b{color:var(--ink)}
+  .syslist p{margin-bottom:14px}
+
+  /* flywheel slide */
+  .flywheel{display:flex;align-items:center;justify-content:center;gap:clamp(8px,1.6vw,20px);margin-top:52px;flex-wrap:wrap}
+  .fstep{border:1.5px solid var(--line-dark);border-radius:14px;padding:22px 26px;text-align:center;min-width:150px;background:rgba(244,240,230,.04);opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+  .slide.active .fstep{opacity:1;transform:none}
+  .slide.active .fstep:nth-of-type(1){transition-delay:.15s}
+  .slide.active .fstep:nth-of-type(3){transition-delay:.45s}
+  .slide.active .fstep:nth-of-type(5){transition-delay:.75s}
+  .slide.active .fstep:nth-of-type(7){transition-delay:1.05s}
+  .fstep .ft{font-weight:900;font-size:19px;letter-spacing:-.01em}
+  .fstep .fd{font-size:12.5px;color:var(--mut-dark);margin-top:6px}
+  .fstep:nth-of-type(1) .ft{color:var(--cyan)}
+  .fstep:nth-of-type(3) .ft{color:var(--paper)}
+  .fstep:nth-of-type(5) .ft{color:var(--plum-soft)}
+  .fstep:nth-of-type(7) .ft{color:var(--gold)}
+  .farrow{font-size:22px;font-weight:900;color:var(--gold);opacity:.8}
+  .flynote{margin-top:46px;font-size:clamp(16px,1.8vw,22px);font-weight:700;line-height:1.5;max-width:820px;color:var(--paper)}
+  .flynote .gold{color:var(--gold)}
+
+  /* pillars slide */
+  .plan{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}
+  .pcard{border:1px solid var(--line-light);border-radius:16px;padding:26px;background:#fff;box-shadow:0 8px 24px rgba(15,16,40,.06)}
+  .pcard .tag{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .pcard:nth-child(1) .tag{color:var(--gold-deep)}
+  .pcard:nth-child(2) .tag{color:#067a9c}
+  .pcard:nth-child(3) .tag{color:var(--plum)}
+  .pcard:nth-child(4) .tag{color:var(--gold-deep)}
+  .pcard .pt{font-weight:800;font-size:18px;letter-spacing:-.015em;margin:10px 0 8px}
+  .pcard .pd{font-size:14px;line-height:1.55;color:var(--mut-light)}
+
+  /* proof slide */
+  .proofgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
+  .proof{border:1px solid var(--line-dark);border-radius:16px;padding:30px 22px;text-align:center;background:rgba(244,240,230,.04)}
+  .proof .pn{font-size:clamp(30px,3.6vw,52px);font-weight:900;letter-spacing:-.035em;color:var(--gold);line-height:1}
+  .proof:nth-child(2) .pn{color:var(--plum-soft)}
+  .proof:nth-child(3) .pn{color:var(--cyan)}
+  .proof .pl{font-size:13px;color:var(--mut-dark);margin-top:12px;line-height:1.45}
+  .proof .pl b{color:var(--paper)}
+  .stars{color:var(--gold);letter-spacing:3px;font-size:15px;margin-top:8px}
+
+  /* close slide */
+  .close-inner{text-align:center;max-width:900px;margin:0 auto}
+  .close-inner h2{font-size:clamp(36px,5.6vw,74px)}
+  .btn{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--gold);font-weight:700;font-size:16px;padding:18px 34px;border-radius:10px;margin-top:34px;text-decoration:none;transition:transform .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .signoff{margin-top:44px;font-weight:900;font-size:22px;letter-spacing:-.02em;color:var(--ink)}
+
+  /* chrome */
+  .brand{position:fixed;top:26px;left:34px;z-index:50;font-weight:900;font-size:19px;letter-spacing:-.03em;color:var(--paper);mix-blend-mode:difference}
+  .brand span{color:var(--gold)}
+  .counter{position:fixed;top:30px;right:36px;z-index:50;font-size:12px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.85);mix-blend-mode:difference}
+  .dots{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:9px}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.6);mix-blend-mode:difference;cursor:pointer;border:none;padding:0;transition:transform .2s,opacity .2s;opacity:.45}
+  .dot.on{opacity:1;transform:scale(1.45)}
+  .hint{position:fixed;bottom:24px;right:34px;z-index:50;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.75);mix-blend-mode:difference}
+  .navzone{position:fixed;top:0;bottom:0;width:18%;z-index:40;cursor:pointer}
+  .navzone.left{left:0}.navzone.right{right:0}
+
+  @media(max-width:880px){
+    .rings{display:none}
+    .painrow{grid-template-columns:1fr;gap:12px}
+    .paincard{padding:20px}
+    .datagrid{grid-template-columns:1fr;gap:26px}
+    .dial{width:min(60vw,260px)}
+    .sysgrid{grid-template-columns:1fr;gap:26px}
+    .orbitwrap{width:min(84vw,340px)}
+    .plan{grid-template-columns:1fr;gap:12px}
+    .proofgrid{grid-template-columns:repeat(2,1fr);gap:12px}
+    .flywheel{gap:8px}
+    .fstep{min-width:120px;padding:16px}
+    .farrow{display:none}
+    .hint{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .slide.active .dial .fill{stroke-dashoffset:226}
+    .slide.active .threelines .tl,.slide.active .fstep{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="brand">HOWL<span>.</span></div>
+<div class="counter"><span id="cur">1</span> / <span id="tot">10</span></div>
+<div class="hint">Use arrow keys or click</div>
+<div class="navzone left" onclick="go(-1)"></div>
+<div class="navzone right" onclick="go(1)"></div>
+
+<div class="deck">
+
+<!-- 1 · TITLE -->
+<section class="slide s-navy active">
+  <div class="rings"><span></span><span></span><span></span><span></span><span class="core"></span></div>
+  <div class="slide-inner">
+    <div class="eyebrow">Your strategic visibility partner</div>
+    <h1>Complete, consistent<br><span class="gold">visibility.</span></h1>
+    <p class="sub">How your business gets in front of its ideal customer, earns their trust before the buying moment, and stays there. Forever.</p>
+    <div class="kicker">Howl Marketing &amp; Business Development · Hightstown, NJ · Working nationwide</div>
+  </div>
+</section>
+
+<!-- 2 · THE BELIEF -->
+<section class="slide s-paper">
+  <div class="slide-inner">
+    <div class="eyebrow">The belief</div>
+    <div class="bigquote" style="margin-top:26px">"Sales hasn't fundamentally changed. People still work with those they <span class="hl">know, like, and trust</span>. What changed is how hard it is to stay in front of the right people long enough to be top of mind when they're ready."</div>
+    <div class="attr">
+      <div class="avatar">DC</div>
+      <div class="attr-name"><b>Dan Cooley</b><span>Founder and CEO, Howl Marketing</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · THE PROBLEM -->
+<section class="slide s-navy">
+  <div class="slide-inner">
+    <div class="eyebrow">The problem</div>
+    <h2>Every channel is <span class="plum">saturated.</span></h2>
+    <div class="painrow">
+      <div class="paincard"><div class="pt">Same lists, same targets</div><div class="pd">Everyone pulls prospects from the same data sources and hits the same inboxes. Single-channel outreach gets ignored as noise.</div></div>
+      <div class="paincard"><div class="pt">Buyers shortlist in silence</div><div class="pd">The research happens before anyone reaches out. If you weren't visible while they were looking, you were never on the list.</div></div>
+      <div class="paincard"><div class="pt">One touch is invisible</div><div class="pd">A single impression, however good, doesn't survive the week. Familiarity takes repetition across surfaces, not volume on one.</div></div>
+    </div>
+    <div class="punch">There are no infinite strategies anymore. You have to be <span class="gold">everywhere.</span></div>
+  </div>
+</section>
+
+<!-- 4 · THE BUYING MOMENT CHANGED -->
+<section class="slide s-paper">
+  <div class="slide-inner">
+    <div class="eyebrow">The buying moment changed</div>
+    <h2>Your buyer decides <span class="plum">before you know they exist.</span></h2>
+    <div class="datagrid">
+      <div class="dial">
+        <svg viewBox="0 0 260 260"><circle class="track" cx="130" cy="130" r="120"/><circle class="fill" cx="130" cy="130" r="120"/></svg>
+        <div class="dialnum"><div><b>70%</b><i>of the B2B buyer journey is complete before anyone contacts sales</i></div></div>
+      </div>
+      <div class="datafacts">
+        <div class="fact"><div class="fn"><em>64.8%</em> zero-click</div><div class="fl">Nearly two thirds of Google searches now end without a click. The answer, and the impression, happens before your website is ever visited.</div></div>
+        <div class="fact"><div class="fn">AI answers first</div><div class="fl">Buyers increasingly ask ChatGPT, Claude, and Perplexity who to hire. If you are not in the sources AI cites, you are not in the answer.</div></div>
+        <div class="fact"><div class="fn">Trust is pre-built</div><div class="fl">By the time a buyer reaches out, the shortlist already exists. Visibility during the silent research phase is what puts you on it.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · THE LINE -->
+<section class="slide s-navy">
+  <div class="slide-inner">
+    <div class="eyebrow">The operating principle</div>
+    <div class="threelines" style="margin-top:30px">
+      <div class="tl">Be there when they're on <b class="c1">LinkedIn.</b></div>
+      <div class="tl">Be there when they're in their <b class="c2">inbox.</b></div>
+      <div class="tl">Be there when they ask their <b class="c3">AI assistant.</b></div>
+    </div>
+    <div class="srcnote">Not three campaigns. One presence, on every surface your buyer actually uses.</div>
+  </div>
+</section>
+
+<!-- 6 · THE SYSTEM -->
+<section class="slide s-paper">
+  <div class="slide-inner sysgrid">
+    <div class="orbitwrap">
+      <div class="orbit-ring"></div>
+      <div class="orbit-ring r2"></div>
+      <div class="orbit-center">Your ideal<br>customer</div>
+      <div class="node gold" style="top:4%;left:50%">Founder LinkedIn</div>
+      <div class="node cyan" style="top:22%;left:91%">Warm email</div>
+      <div class="node plum" style="top:58%;left:99%">AI search citations</div>
+      <div class="node" style="top:88%;left:80%">SEO</div>
+      <div class="node cyan" style="top:98%;left:42%">Quora and Reddit</div>
+      <div class="node plum" style="top:82%;left:8%">Original research</div>
+      <div class="node" style="top:48%;left:0%">Talks and webinars</div>
+      <div class="node gold" style="top:16%;left:11%">Website and visitor ID</div>
+    </div>
+    <div>
+      <div class="eyebrow cyan">The system</div>
+      <h2 style="font-size:clamp(26px,3.4vw,44px)">One engine. <span class="gold">Every surface.</span></h2>
+      <div class="syslist">
+        <p><b>Founder thought leadership</b> puts your voice, not a logo, in front of the market weekly.</p>
+        <p><b>Warm email</b> keeps giving value to everyone you've touched until they convert, not until they're forgotten.</p>
+        <p><b>SEO and AI search</b> make you the answer when a buyer asks Google or their AI who does this work.</p>
+        <p><b>Research, talks, and community presence</b> feed the sources AI engines cite and buyers trust. Each surface reinforces the next.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · CONSISTENCY COMPOUNDS -->
+<section class="slide s-navy">
+  <div class="slide-inner" style="text-align:center">
+    <div class="eyebrow" style="justify-content:center">Why consistency wins</div>
+    <h2>Presence <span class="gold">compounds.</span></h2>
+    <div class="flywheel">
+      <div class="fstep"><div class="ft">Presence</div><div class="fd">Show up on every surface, every week</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="ft">Familiarity</div><div class="fd">Repetition turns a name into a known one</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="ft">Preference</div><div class="fd">Known becomes trusted becomes chosen</div></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="ft">Pipeline</div><div class="fd">They reach out feeling like they know you</div></div>
+    </div>
+    <div class="flynote">This is not a campaign with an end date. It's a steady presence that <span class="gold">compounds</span> until the buyer feels like they already know you.</div>
+  </div>
+</section>
+
+<!-- 8 · WHAT WE RUN -->
+<section class="slide s-paper">
+  <div class="slide-inner">
+    <div class="eyebrow">What we run for you</div>
+    <h2>Four pillars. <span class="plum">One engine.</span></h2>
+    <div class="plan">
+      <div class="pcard"><div class="tag">01 · Reach</div><div class="pt">B2B outreach</div><div class="pd">LinkedIn-led outbound and cold email built as one coordinated system, so the same right-fit decision makers hear from you on both surfaces until the timing is right.</div></div>
+      <div class="pcard"><div class="tag">02 · Capture</div><div class="pt">CRM and follow-through</div><div class="pd">HubSpot or GoHighLevel built and run so no lead slips. Non-responders become a warm pool that keeps receiving real value on a rhythm, until they convert.</div></div>
+      <div class="pcard"><div class="tag">03 · Trust</div><div class="pt">Content and thought leadership</div><div class="pd">Founder-voice content on LinkedIn, blogs, and email that sounds like you and builds the credibility buyers look for long before they ever reach out.</div></div>
+      <div class="pcard"><div class="tag">04 · Found</div><div class="pt">SEO and AI search visibility</div><div class="pd">Show up in Google and in AI answers from ChatGPT, Claude, and Perplexity. Structured content, original research, and cross-web presence make you the cited answer.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · PROOF -->
+<section class="slide s-navy">
+  <div class="slide-inner" style="text-align:center">
+    <div class="eyebrow" style="justify-content:center">The receipts</div>
+    <h2>Real firms. <span class="gold">Real numbers.</span></h2>
+    <div class="proofgrid">
+      <div class="proof"><div class="pn">500%</div><div class="pl">marketing ROI<br><b>Prosperity Bookkeeping</b></div></div>
+      <div class="proof"><div class="pn">+170%</div><div class="pl">LinkedIn growth<br><b>Fennelly Associates</b></div></div>
+      <div class="proof"><div class="pn">3+ yrs</div><div class="pl">average client<br>retention with Howl</div></div>
+      <div class="proof"><div class="pn">5.0</div><div class="stars">★★★★★</div><div class="pl">rated on Google<br>by our clients</div></div>
+    </div>
+    <div class="kicker" style="margin-top:40px;text-align:center">Named clients, attributed numbers. Not industry averages, not blended figures.</div>
+  </div>
+</section>
+
+<!-- 10 · CLOSE -->
+<section class="slide s-gold">
+  <div class="slide-inner close-inner">
+    <div class="eyebrow" style="justify-content:center">The promise</div>
+    <h2>Get and stay in front of your ideal customer. <span class="plum">Forever.</span></h2>
+    <p class="sub" style="margin:18px auto 0;max-width:640px">This is the system we build and run. When we talk, we'll map the surfaces where your buyers actually are and what month one looks like.</p>
+    <div class="signoff">Howl louder.</div>
+  </div>
+</section>
+
+</div>
+
+<div class="dots" id="dots"></div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const dotsWrap=document.getElementById('dots');
+  const cur=document.getElementById('cur');
+  document.getElementById('tot').textContent=slides.length;
+  let i=0;
+  slides.forEach((_,n)=>{
+    const d=document.createElement('button');
+    d.className='dot'+(n===0?' on':'');
+    d.setAttribute('aria-label','Go to slide '+(n+1));
+    d.onclick=()=>show(n);
+    dotsWrap.appendChild(d);
+  });
+  const dots=[...dotsWrap.children];
+  function show(n){
+    if(n<0||n>=slides.length)return;
+    slides[i].classList.remove('active');
+    dots[i].classList.remove('on');
+    i=n;
+    slides[i].classList.add('active');
+    dots[i].classList.add('on');
+    cur.textContent=i+1;
+  }
+  function go(dir){show(i+dir)}
+  window.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(e.key)){e.preventDefault();go(1)}
+    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
+    if(e.key==='Home')show(0);
+    if(e.key==='End')show(slides.length-1);
+  });
+  let tx=null;
+  window.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+  window.addEventListener('touchend',e=>{
+    if(tx===null)return;
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50)go(dx<0?1:-1);
+    tx=null;
+  },{passive:true});
+</script>
+</body>
+</html>
